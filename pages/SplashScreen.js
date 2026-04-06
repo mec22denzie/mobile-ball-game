@@ -38,7 +38,12 @@ const SplashScreen = ({ onHide }) => {
 			resizeMode="cover">
 			<Animated.View style={{ opacity, transform: [{ translateY }] }}>
 				{/* Optional bird for visual match */}
-				<Image source={require("../assets/bird.png")} style={styles.bird} />
+				<View style={styles.birdContainer}>
+				<Image
+					source={require("../assets/bird.png")}
+					style={styles.bird}
+				/>
+				</View>
 
 				<View style={styles.textBox}>
 					<Text style={styles.title}>Basket Shot Game</Text>
@@ -81,11 +86,18 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 	},
-	bird: {
-		width: 80,
-		height: 80,
+	birdContainer: {
+		width: 85,         
+		height: 70,
+		overflow: "hidden",
 		alignSelf: "center",
 		marginBottom: 20,
+	},
+
+	bird: {
+		width: 180,        
+		height: 70,
+		marginLeft: -5,    
 	},
 	title: {
 		fontSize: 36,
