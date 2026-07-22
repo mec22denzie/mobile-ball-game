@@ -18,6 +18,7 @@ const Physics = (entities, { touches, dispatch, events, time }) => {
 			dispatch({ type: "ball_reset" });
 		}
 	};
+	const basketY = entities.screen.height - 180;
 
 	/*************TOUCH CONTROLS WITH ARROW KEY ****************/
 	if (events.length) {
@@ -32,7 +33,7 @@ const Physics = (entities, { touches, dispatch, events, time }) => {
 				// Only shoot if ball is offscreen (prevents multiple balls in the air)
 				if (
 					entities.Ball.body.position.y < 0 ||
-					entities.Ball.body.position.y > Constants.WINDOW_HEIGHT
+					entities.Ball.body.position.y > entities.screen.height
 				) {
 					let cannonAngle = entities.Cannon.body.angle;
 
@@ -54,13 +55,14 @@ const Physics = (entities, { touches, dispatch, events, time }) => {
 		}
 	}
 
-	if (entities.Basket) {
+	if (entities.Basket && entities.screen) {
 		Matter.Body.setPosition(entities.Basket.body, {
 			x: entities.Basket.body.position.x,
-			y: 500, // Lock strictly to the ground level so it doesn't fall
+			y: basketY,
 		});
+
 		Matter.Body.setVelocity(entities.Basket.body, {
-			x: entities.Basket.body.velocity.x * 0.85, // Friction slows it down when button is released
+			x: entities.Basket.body.velocity.x * 0.85,
 			y: 0,
 		});
 	}
@@ -88,11 +90,11 @@ const Physics = (entities, { touches, dispatch, events, time }) => {
 
 			let phase = index * (Math.PI / 1.5);
 			let speed = 1500 + index * 300;
-			let xOffset = Math.sin(birdFloatTime / speed + phase) * (Constants.WINDOW_WIDTH / 2 - 40);
+			let xOffset = Math.sin(birdFloatTime / speed + phase) * (entities.screen.width / 2 - 40);
 
 			// Lock birds Y position strictly to the fixed heights!
 			Matter.Body.setPosition(entities[birdKey].body, {
-				x: Constants.WINDOW_WIDTH / 2 + xOffset,
+				x: entities.screen.width / 2 + xOffset,
 				y: birdHeights[birdKey],
 			});
 
@@ -137,7 +139,7 @@ const Physics = (entities, { touches, dispatch, events, time }) => {
 			// Failsafe: if it hits the bottom boundary (missed the basket entirely)
 			if (isMatch("Player", "Boundary")) {
 				let ballBody = labelA === "Player" ? pair.bodyA : pair.bodyB;
-				if (ballBody.position.y > Constants.WINDOW_HEIGHT - 60) {
+				if (ballBody.position.y > entities.screen.height - 60) {
 					resetBall();
 				}
 			}

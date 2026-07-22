@@ -7,8 +7,8 @@ import Basket from "../components/Basket";
 import BirdObstacle from "../components/Bird";
 
 export default (
-  windowWidth = Constants.WINDOW_WIDTH,
-  windowHeight = Constants.WINDOW_HEIGHT
+  windowWidth,
+  windowHeight
 ) => {
   const engine = Matter.Engine.create({
     enableSleeping: false,
@@ -16,6 +16,7 @@ export default (
 
   const world = engine.world;
   engine.gravity.y = 1;
+  const basketY = windowHeight - 140;
 
   return {
     physics: {
@@ -58,21 +59,18 @@ export default (
       }
     ),
 
-    Basket: Basket(
-      world,
-      {
-        x: windowWidth / 2,
-        y: windowHeight - 140,
-      },
-      {
-        width: 220,
-        height: 100,
-      },
-      {
-        label: "Basket",
-        isStatic: false,
-      }
-    ),
+	Basket: Basket(
+		world,
+		{
+			x: windowWidth / 2,
+			y: basketY,
+		},
+		{ width: 220, height: 100 },
+		{
+			label: "Basket",
+			isStatic: false,
+		},
+	),
 
     Bird1: BirdObstacle(
       world,
