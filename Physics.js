@@ -57,7 +57,7 @@ const Physics = (entities, { touches, dispatch, events, time }) => {
 	if (entities.Basket) {
 		Matter.Body.setPosition(entities.Basket.body, {
 			x: entities.Basket.body.position.x,
-			y: 750, // Lock strictly to the ground level so it doesn't fall
+			y: 500, // Lock strictly to the ground level so it doesn't fall
 		});
 		Matter.Body.setVelocity(entities.Basket.body, {
 			x: entities.Basket.body.velocity.x * 0.85, // Friction slows it down when button is released
