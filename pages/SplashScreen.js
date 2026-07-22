@@ -5,7 +5,6 @@ import {
 	Text,
 	StyleSheet,
 	TouchableOpacity,
-	ImageBackground,
 	Image,
 	TextInput,
 } from "react-native";
@@ -32,10 +31,11 @@ const SplashScreen = ({ onHide }) => {
 	}, []);
 
 	return (
-		<ImageBackground
+		<View style={styles.container}>
+		{/* <ImageBackground
 			source={require("../assets/Sky.png")} // SAME BACKGROUND AS GAME
 			style={styles.container}
-			resizeMode="cover">
+			resizeMode="cover"> */}
 			<Animated.View style={{ opacity, transform: [{ translateY }] }}>
 				{/* Optional bird for visual match */}
 				<View style={styles.birdContainer}>
@@ -76,7 +76,7 @@ const SplashScreen = ({ onHide }) => {
 					<Text style={styles.buttonText}>START GAME</Text>
 				</TouchableOpacity>
 			</Animated.View>
-		</ImageBackground>
+		</View>
 	);
 };
 

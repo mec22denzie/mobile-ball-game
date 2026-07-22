@@ -1,9 +1,14 @@
 import { StatusBar } from "expo-status-bar";
-import { TouchableOpacity, StyleSheet, Text, View, Alert, ImageBackground } from "react-native";
+import { TouchableOpacity, StyleSheet, Text, View, Alert, Image, useWindowDimensions, } from "react-native";
 import { Audio } from "expo-av";
 import { GameEngine } from "react-native-game-engine";
 import entities from "./entities/index";
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Physics from "./Physics";
 import SplashScreen from "./pages/SplashScreen";
 import SoundButton from "./components/SoundButton";
@@ -22,6 +27,10 @@ export default function App() {
 	const ballQuantityRef = useRef(Constants.BALL_QUANTITY);
 	const playerNameRef = useRef("");
 	const scoreRef = useRef(0);
+	const { width, height } = useWindowDimensions();
+	const gameEntities = useMemo(() => {
+			return entities(width, height);
+			}, [width, height]);
 	const startGame = enteredName => {
 		playerNameRef.current = enteredName;
 		setRunning(true);
@@ -30,7 +39,8 @@ export default function App() {
 		scoreRef.current = 0;
 		ballQuantityRef.current = Constants.BALL_QUANTITY;
 		setBallQuantity(Constants.BALL_QUANTITY);
-		gameEngine.swap(entities());
+		//gameEngine.swap(entities());
+		gameEngine.swap(entities(width, height));
 		gameEngine.start();
 	};
 
@@ -41,7 +51,7 @@ export default function App() {
 		scoreRef.current = 0;
 		ballQuantityRef.current = Constants.BALL_QUANTITY;
 		setBallQuantity(Constants.BALL_QUANTITY);
-		gameEngine.swap(entities());
+		gameEngine.swap(entities(width, height));
 		gameEngine.start();
 	};
 
@@ -117,59 +127,77 @@ export default function App() {
 	}, [sound]);
 
 	return (
-		<View style={styles.container}>
-			<ImageBackground
-				source={require("./assets/Sky.png")}
-				style={styles.gameBackground}
-				resizeMode="cover">
+		<View  style={[
+			styles.container,
+			{
+			width,
+			height,
+			},
+		]}>
+			<View style={styles.gameArea}>
+				<Image
+					source={require("./assets/Sky.png")}
+					style={styles.backgroundImage}
+					resizeMode="cover"
+				/>
+
 				<GameEngine
+					key={`${width}-${height}`}
 					ref={ref => {
-						setGameEngine(ref);
+					setGameEngine(ref);
 					}}
 					systems={[Physics]}
-					entities={entities()}
+					entities={gameEntities}
 					running={running}
 					onEvent={e => {
-						switch (e.type) {
-							case "game_over":
-								setRunning(false);
-								setGameOver(true);
-								gameEngine.stop();
-								updateRankBoard();
-								break;
-							case "getScore":
-								scoreRef.current += 10;
-								setScore(scoreRef.current);
-								break;
-							case "ball_reset":
-								if (ballQuantityRef.current <= 0) {
-									setRunning(false);
-									setGameOver(true);
-									gameEngine.stop();
-									updateRankBoard();
-								}
-								break;
+					switch (e.type) {
+						case "game_over":
+						setRunning(false);
+						setGameOver(true);
+						gameEngine.stop();
+						updateRankBoard();
+						break;
+
+						case "getScore":
+						scoreRef.current += 10;
+						setScore(scoreRef.current);
+						break;
+
+						case "ball_reset":
+						if (ballQuantityRef.current <= 0) {
+							setRunning(false);
+							setGameOver(true);
+							gameEngine.stop();
+							updateRankBoard();
 						}
+						break;
+
+						default:
+						break;
+					}
 					}}
-					style={styles.gameContainer}>
-					<StatusBar style="auto" hidden={true} />
+					style={styles.gameContainer}
+				>
+					<StatusBar style="auto" hidden />
 				</GameEngine>
 
-				{/*Splash Screen shows game info and group member and start btn */}
 				{!running && <SplashScreen onHide={startGame} />}
-				{/* the toggle sound btn */}
+
 				<View style={styles.soundBtn}>
-					<SoundButton isSoundOn={isSoundOn} onPress={toggleSound} />
+					<SoundButton
+					isSoundOn={isSoundOn}
+					onPress={toggleSound}
+					/>
 				</View>
-				{/* the balls counter */}
+
 				{running && (
 					<View style={styles.ballCountContainer}>
-						<Text style={styles.ballCountText}>
-							🏀 {ballQuantity} / {Constants.BALL_QUANTITY}
-						</Text>
+					<Text style={styles.ballCountText}>
+						🏀 {ballQuantity} / {Constants.BALL_QUANTITY}
+					</Text>
 					</View>
 				)}
-			</ImageBackground>
+				</View>
 
 			{running && (
 				<View style={styles.controls}>
@@ -220,18 +248,30 @@ export default function App() {
 
 // Styles here
 const styles = StyleSheet.create({
-	container: {
+/* 	container: {
 		flex: 1,
 		backgroundColor: "#fff",
 		alignItems: "center",
 		justifyContent: "flex-end",
-	},
-	gameContainer: {
+	}, */
+	container: {
+		flex: 1,
+		width: "100%",
+		height: "100%",
+		backgroundColor: "#fff",
+		alignItems: "center",
+		justifyContent: "flex-end",
+		overflow: "hidden",
+		},
+/* 	gameContainer: {
 		position: "absolute",
 		left: 0,
 		top: 0,
 		right: 0,
 		bottom: 0,
+	}, */
+	gameContainer: {
+	...StyleSheet.absoluteFillObject,
 	},
 
 	watermark: {
@@ -240,16 +280,19 @@ const styles = StyleSheet.create({
 	},
 
 	controls: {
-		flex: 1,
-		top: Constants.SCREEN_HEIGHT - 120,
-		alignItem: "center",
-		gap: 4,
+		position: "absolute",
+		left: 0,
+		right: 0,
+		bottom: 25,
+		alignItems: "center",
+		zIndex: 200,
 	},
 
 	controlRow: {
 		flexDirection: "row",
 		justifyContent: "center",
-		gap: 4,
+		alignItems: "center",
+		gap: 8,
 	},
 
 	centerText: {
@@ -298,12 +341,23 @@ const styles = StyleSheet.create({
 		fontWeight: 800,
 		color: "pink",
 	},
-	gameBackground: {
+/* 	gameBackground: {
 		position: "absolute",
 		top: 0,
 		width: "100%",
 		height: "100%", // top half of the screen
+	}, */
+	gameArea: {
+	...StyleSheet.absoluteFillObject,
+	overflow: "hidden",
 	},
+
+	backgroundImage: {
+	...StyleSheet.absoluteFillObject,
+	width: "100%",
+	height: "100%",
+	},
+	
 	soundBtn: {
 		position: "absolute",
 		top: 40,
@@ -314,13 +368,14 @@ const styles = StyleSheet.create({
 	ballCountContainer: {
 		position: "absolute",
 		top: 40,
-		right: Constants.WINDOW_WIDTH / 2 + 70,
+		left: 20,
 		backgroundColor: "rgba(0, 0, 0, 0.5)",
 		paddingVertical: 5,
 		paddingHorizontal: 10,
 		borderRadius: 8,
 		borderWidth: 1,
 		borderColor: "white",
+		zIndex: 100,
 	},
 	ballCountText: {
 		color: "white",

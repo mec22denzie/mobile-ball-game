@@ -1,4 +1,3 @@
-import { Dimensions } from "react-native";
 import Boundary from "../components/Boundary";
 import Matter from "matter-js";
 import Constants from "../Constants";
@@ -7,102 +6,186 @@ import Cannon from "../components/Cannon";
 import Basket from "../components/Basket";
 import BirdObstacle from "../components/Bird";
 
-// const screenHeight = Dimensions.get("window").height;
-// const screenWidth = Dimensions.get("window").width;
+export default (
+  windowWidth = Constants.WINDOW_WIDTH,
+  windowHeight = Constants.WINDOW_HEIGHT
+) => {
+  const engine = Matter.Engine.create({
+    enableSleeping: false,
+  });
 
-export default gameWorld => {
-	let engine = Matter.Engine.create({ enableSleeping: false });
-	let world = engine.world;
-	engine.gravity.y = 1;
+  const world = engine.world;
+  engine.gravity.y = 1;
 
-	return {
-		physics: { engine, world },
-		//cannon
-		Cannon: Cannon(
-			world,
-			{ x: Constants.WINDOW_WIDTH / 2, y: 70 },
-			{ width: 120, height: 100 },
-			{
-				isStatic: true,
-				label: "Enemy",
-			},
-		),
-		//Ball
-		Ball: Ball(world, { x: -1000, y: -1000 }, 30, { label: "Player" }),
+  return {
+    physics: {
+      engine,
+      world,
+    },
 
-		//Basket
-		Basket: Basket(
-			world,
-			{ x: Constants.WINDOW_WIDTH / 2, y: 700 },
-			{ width: 220, height: 100 },
-			{
-				label: "Basket",
-				isStatic: false,
-			},
-		),
-		Bird1: BirdObstacle(
-			world,
-			{ x: 300, y: 230 },
-			{ width: 80, height: 60 },
-			{
-				label: "BirdObstacle",
-				isStatic: false,
-			},
-		),
-		Bird2: BirdObstacle(
-			world,
-			{ x: 100, y: 380 },
-			{ width: 80, height: 60 },
-			{
-				label: "BirdObstacle",
-				isStatic: false,
-			},
-		),
-		Bird3: BirdObstacle(
-			world,
-			{ x: 250, y: 520 },
-			{ width: 80, height: 60 },
-			{
-				label: "BirdObstacle",
-				isStatic: false,
-			},
-		),
-		//Boundary
-		BoundaryTop: Boundary(
-			world,
-			"yellow",
-			{ x: Constants.WINDOW_WIDTH / 2, y: 0 },
-			{ height: 30, width: Constants.WINDOW_WIDTH },
-		),
+    // Store the current browser dimensions for Physics.js
+    screen: {
+      width: windowWidth,
+      height: windowHeight,
+      renderer: null,
+    },
 
-		BoundaryLeft: Boundary(
-			world,
-			"yellow",
-			{ x: 0, y: Constants.WINDOW_HEIGHT / 2 },
-			{ height: Constants.WINDOW_HEIGHT, width: 30 },
-		),
+    Cannon: Cannon(
+      world,
+      {
+        x: windowWidth / 2,
+        y: 70,
+      },
+      {
+        width: 120,
+        height: 100,
+      },
+      {
+        isStatic: true,
+        label: "Enemy",
+      }
+    ),
 
-		BoundaryRight: Boundary(
-			world,
-			"yellow",
-			{ x: Constants.WINDOW_WIDTH, y: Constants.WINDOW_HEIGHT / 2 },
-			{ height: Constants.WINDOW_HEIGHT, width: 30 },
-		),
+    Ball: Ball(
+      world,
+      {
+        x: -1000,
+        y: -1000,
+      },
+      30,
+      {
+        label: "Player",
+      }
+    ),
 
-		// Ground underneath the basket
-		Ground: Boundary(
-			world,
-			"transparent",
-			{ x: Constants.WINDOW_WIDTH / 2, y: 760 }, // Sits just underneath the basket
-			{ height: 40, width: Constants.WINDOW_WIDTH },
-			"ground",
-		),
+    Basket: Basket(
+      world,
+      {
+        x: windowWidth / 2,
+        y: windowHeight - 140,
+      },
+      {
+        width: 220,
+        height: 100,
+      },
+      {
+        label: "Basket",
+        isStatic: false,
+      }
+    ),
 
-		BoundaryBottom: Boundary(
-			world,
-			"yellow",
-			{ x: Constants.WINDOW_WIDTH / 2, y: Constants.WINDOW_HEIGHT },
-			{ height: 30, width: Constants.WINDOW_WIDTH },
-		),
-	};
+    Bird1: BirdObstacle(
+      world,
+      {
+        x: windowWidth * 0.75,
+        y: windowHeight * 0.27,
+      },
+      {
+        width: 80,
+        height: 60,
+      },
+      {
+        label: "BirdObstacle",
+        isStatic: false,
+      }
+    ),
+
+    Bird2: BirdObstacle(
+      world,
+      {
+        x: windowWidth * 0.8,
+        y: windowHeight * 0.45,
+      },
+      {
+        width: 80,
+        height: 60,
+      },
+      {
+        label: "BirdObstacle",
+        isStatic: false,
+      }
+    ),
+
+    Bird3: BirdObstacle(
+      world,
+      {
+        x: windowWidth * 0.7,
+        y: windowHeight * 0.62,
+      },
+      {
+        width: 80,
+        height: 60,
+      },
+      {
+        label: "BirdObstacle",
+        isStatic: false,
+      }
+    ),
+
+    BoundaryTop: Boundary(
+      world,
+      "yellow",
+      {
+        x: windowWidth / 2,
+        y: 0,
+      },
+      {
+        height: 30,
+        width: windowWidth,
+      }
+    ),
+
+    BoundaryLeft: Boundary(
+      world,
+      "yellow",
+      {
+        x: 0,
+        y: windowHeight / 2,
+      },
+      {
+        height: windowHeight,
+        width: 30,
+      }
+    ),
+
+    BoundaryRight: Boundary(
+      world,
+      "yellow",
+      {
+        x: windowWidth,
+        y: windowHeight / 2,
+      },
+      {
+        height: windowHeight,
+        width: 30,
+      }
+    ),
+
+    Ground: Boundary(
+      world,
+      "transparent",
+      {
+        x: windowWidth / 2,
+        y: windowHeight - 60,
+      },
+      {
+        height: 40,
+        width: windowWidth,
+      },
+      "ground"
+    ),
+
+    BoundaryBottom: Boundary(
+      world,
+      "yellow",
+      {
+        x: windowWidth / 2,
+        y: windowHeight,
+      },
+      {
+        height: 30,
+        width: windowWidth,
+      }
+    ),
+  };
 };
