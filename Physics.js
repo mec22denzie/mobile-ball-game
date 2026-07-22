@@ -18,7 +18,7 @@ const Physics = (entities, { touches, dispatch, events, time }) => {
 			dispatch({ type: "ball_reset" });
 		}
 	};
-	const basketY = entities.screen.height - 180;
+	const basketY = entities.screen.height - 140;
 
 	/*************TOUCH CONTROLS WITH ARROW KEY ****************/
 	if (events.length) {
